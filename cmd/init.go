@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/urfave/cli/v2"
 
 	"github.com/filecoin-project/lotus/chain/types"
@@ -18,21 +20,17 @@ var initCmd = &cli.Command{
 			Hidden:  true,
 			Value:   "~/.offline-wallet", // TODO: Consider XDG_DATA_HOME
 		},
-		&cli.BoolFlag{
-			Name:  "enabled",
-			Usage: "Initial offline wallet",
-			Value: true,
-		},
 	},
 	Action: func(cctx *cli.Context) error {
-		// fmt.Println("DEPRECATED: This command will be removed in the future")
-
 		lr, _, err := openRepo(cctx)
 		if err != nil {
 			return err
 		}
 
 		lr.Close()
+
+		fmt.Println()
+		fmt.Println("Ininital offline wallet repo at: ", cctx.String("repo"))
 
 		return nil
 	},

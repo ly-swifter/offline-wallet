@@ -31,14 +31,10 @@ func main() {
 				Value:   "~/.offline-wallet", // TODO: Consider XDG_DATA_HOME
 			},
 			&cli.BoolFlag{
-				Name:  "offline",
-				Usage: "offline mode",
-				Value: false,
-			},
-			&cli.BoolFlag{
-				Name:  "calibnet",
-				Usage: "",
-				Value: true,
+				Name:   "offline",
+				Hidden: true,
+				Usage:  "offline mode",
+				Value:  false,
 			},
 		},
 		Before: func(cctx *cli.Context) error {

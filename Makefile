@@ -40,6 +40,9 @@ CLEAN+=build/.update-submodules
 deps: $(BUILD_DEPS)
 .PHONY: deps
 
+build-devnets: build
+.PHONY: build-devnets
+
 MODULES+=$(FFI_PATH)
 BUILD_DEPS+=build/.filecoin-ffi-install
 CLEAN+=build/.filecoin-ffi-install
@@ -58,3 +61,6 @@ BINS+=offline-wallet
 
 build: offline-wallet
 .PHONY: build
+
+calibnet: GOFLAGS+=-tags=calibnet
+calibnet: build-devnets

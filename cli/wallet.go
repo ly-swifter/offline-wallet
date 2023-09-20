@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/hex"
 	"encoding/json"
@@ -21,11 +22,9 @@ import (
 	"github.com/filecoin-project/lotus/build"
 	"github.com/filecoin-project/lotus/chain/types"
 	"github.com/filecoin-project/lotus/chain/types/ethtypes"
-	"github.com/filecoin-project/lotus/chain/wallet/key"
 	cli2 "github.com/filecoin-project/lotus/cli"
 	cliutil "github.com/filecoin-project/lotus/cli/util"
 	"github.com/filecoin-project/lotus/lib/tablewriter"
-	"github.com/howeyc/gopass"
 	"github.com/llifezou/hdwallet"
 	"github.com/pquerna/otp"
 	"github.com/tyler-smith/go-bip39"
@@ -51,7 +50,7 @@ var WalletCmd = &cli.Command{
 		walletSign,
 		walletVerify,
 		walletDelete,
-		walletMarket,
+		// walletMarket,
 	},
 }
 
@@ -502,7 +501,7 @@ var walletImport = &cli.Command{
 		&cli.StringFlag{
 			Name:  "format",
 			Usage: "specify input format for key",
-			Value: "hex-lotus|hex-eth|json-lotus|gfc-json",
+			Value: "hex-lotus",
 		},
 		&cli.BoolFlag{
 			Name:  "as-default",
@@ -516,13 +515,36 @@ var walletImport = &cli.Command{
 		}
 		defer srv.Close()
 		api := srv.WalletAPI()
-		ctx := cliutil.ReqContext(cctx)
+
+		ctx := cli2.ReqContext(cctx)
 
 		var inpdata []byte
 		if !cctx.Args().Present() || cctx.Args().First() == "-" {
-			inpdata, err = gopass.GetPasswdPrompt("Enter private key: ", true, os.Stdin, os.Stdout)
-			if err != nil {
-				return err
+			if term.IsTerminal(int(os.Stdin.Fd())) {
+				fmt.Print("Enter private key(not display in the terminal): ")
+
+				sigCh := make(chan os.Signal, 1)
+				// Notify the channel when SIGINT is received
+				signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
+
+				go func() {
+					<-sigCh
+					fmt.Println("\nInterrupt signal received. Exiting...")
+					os.Exit(1)
+				}()
+
+				inpdata, err = term.ReadPassword(int(os.Stdin.Fd()))
+				if err != nil {
+					return err
+				}
+				fmt.Println()
+			} else {
+				reader := bufio.NewReader(os.Stdin)
+				indata, err := reader.ReadBytes('\n')
+				if err != nil {
+					return err
+				}
+				inpdata = indata
 			}
 
 		} else {
@@ -569,13 +591,6 @@ var walletImport = &cli.Command{
 			default:
 				return fmt.Errorf("unrecognized key type: %d", gk.SigType)
 			}
-		case "hex-eth":
-			ki.Type = types.KTDelegated
-			data, err := hex.DecodeString(strings.TrimSpace(string(inpdata)))
-			if err != nil {
-				return err
-			}
-			ki.PrivateKey = data
 		default:
 			return fmt.Errorf("unrecognized format: %s", cctx.String("format"))
 		}
@@ -591,19 +606,7 @@ var walletImport = &cli.Command{
 			}
 		}
 
-		if ki.Type == types.KTDelegated {
-			k, err := key.NewKey(ki)
-			if err != nil {
-				return err
-			}
-			ethAddress, err := ethtypes.EthAddressFromFilecoinAddress(k.Address)
-			if err != nil {
-				return err
-			}
-			fmt.Printf("imported key (%s)%s successfully!\n", ethAddress, addr)
-		} else {
-			fmt.Printf("imported key %s successfully!\n", addr)
-		}
+		fmt.Printf("imported key %s successfully!\n", addr)
 		return nil
 	},
 }

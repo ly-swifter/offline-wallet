@@ -17,6 +17,7 @@ import (
 	"github.com/urfave/cli/v2"
 	"golang.org/x/xerrors"
 
+	build2 "offline-wallet/build"
 	wallet2 "offline-wallet/chain/wallet"
 	swallet "offline-wallet/wallet"
 )
@@ -24,7 +25,12 @@ import (
 var log = logging.Logger("cli")
 
 func GetWalletAPI(ctx *cli.Context) (ServicesAPI, error) {
-	isTest := ctx.Bool("calibnet")
+	var isTest bool = false
+	networkName := build2.NetworkName
+	if networkName == "test" {
+		isTest = false
+	}
+
 	isOffline := ctx.Bool("offline")
 	lr, ks, err := openRepo(ctx)
 	if err != nil {
