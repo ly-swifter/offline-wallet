@@ -45,6 +45,7 @@ var WalletCmd = &cli.Command{
 		walletExport,
 		walletImport,
 		walletGenerateMnemonic,
+		walletImportMnemonic,
 		walletGetDefault,
 		walletSetDefault,
 		walletSign,
