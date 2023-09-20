@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/big"
+	"offline-wallet/abi/contract"
 	"offline-wallet/wallet"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"

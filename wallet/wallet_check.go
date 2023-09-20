@@ -3,6 +3,10 @@ package wallet
 import (
 	"context"
 	"fmt"
+	stdbig "math/big"
+	build2 "offline-wallet/build"
+	"time"
+
 	"github.com/filecoin-project/go-address"
 	"github.com/filecoin-project/go-state-types/abi"
 	"github.com/filecoin-project/go-state-types/big"
@@ -13,9 +17,6 @@ import (
 	"github.com/filecoin-project/lotus/chain/vm"
 	"github.com/ipfs/go-cid"
 	"golang.org/x/xerrors"
-	stdbig "math/big"
-	"time"
-	build2 "offline-wallet/build"
 )
 
 var baseFeeLowerBoundFactor = types.NewInt(10)
@@ -30,7 +31,7 @@ func (sw *ShedWallet) StateWaitMsg(ctx context.Context, cid cid.Cid, confidence 
 		return nil, err
 	}
 
-	fmt.Printf("BlockExplorer:\t%v\n", fmt.Sprintf(build2.BlockExplorer[mtwkName], cid))
+	fmt.Printf("BlockExplorer:\t%v\n", fmt.Sprintf(build2.BlockExplorer[string(mtwkName)], cid))
 	var found = make(chan struct{})
 	go func() {
 		searchTimer := time.NewTimer(0)

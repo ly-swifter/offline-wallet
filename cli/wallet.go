@@ -25,7 +25,6 @@ import (
 	"github.com/filecoin-project/lotus/lib/tablewriter"
 	"github.com/howeyc/gopass"
 	"github.com/pquerna/otp"
-	"github.com/pquerna/otp/totp"
 	"github.com/urfave/cli/v2"
 	"golang.org/x/xerrors"
 )
@@ -34,7 +33,7 @@ var WalletCmd = &cli.Command{
 	Name:  "wallet",
 	Usage: "Manage wallet",
 	Subcommands: []*cli.Command{
-		walletEncrypt,
+		// walletEncrypt,
 		walletNew,
 		walletList,
 		walletBalance,
@@ -295,106 +294,6 @@ var walletSetDefault = &cli.Command{
 	},
 }
 
-var walletEncrypt = &cli.Command{
-	Name:      "encrypt",
-	Usage:     "encrypt wallet address",
-	ArgsUsage: "[address]",
-	Flags: []cli.Flag{
-		&cli.BoolFlag{
-			Name: "reset",
-		},
-		&cli.BoolFlag{
-			Name:    "use-otp",
-			Usage:   "Use One Time Password",
-			Aliases: []string{"otp"},
-		},
-	},
-	Action: func(cctx *cli.Context) error {
-		srv, err := GetWalletAPI(cctx)
-		if err != nil {
-			return err
-		}
-		defer srv.Close()
-		api := srv.WalletAPI()
-		ctx := cliutil.ReqContext(cctx)
-
-		if cctx.NArg() != 1 {
-			return IncorrectNumArgs(cctx)
-		}
-
-		addr, err := address.NewFromString(cctx.Args().First())
-		if err != nil {
-			return err
-		}
-		var newPasswd, passwd []byte
-		if cctx.Bool("reset") {
-			passwd, err = PromptForAuth("old password", false, addr)
-			if err != nil {
-				return err
-			}
-			newPasswd, err = PromptForAuth("new password", true, addr)
-			if err != nil {
-				return err
-			}
-		} else {
-			passwd, err = PromptForAuth("password", true, addr)
-			if err != nil {
-				return err
-			}
-		}
-
-		encryptType, err := api.WalletEncryptType(ctx, addr)
-		if err != nil {
-			return err
-		}
-		var passcode, otpUrl []byte
-		if encryptType > 0 {
-			if encryptType == 2 {
-				passcode, err = PromptForAuth("OTP Application Passcode", false, addr)
-			}
-			api.SetAuthInfo(ctx, passwd, passcode)
-			_, err := api.WalletSign(ctx, addr, nil)
-			if err != nil {
-				fmt.Println("have not auth to update")
-				return err
-			}
-		}
-		if cctx.Bool("use-otp") {
-			issuer := "filecoin." + build.NetworkBundle
-			otpKey, oerr := totp.Generate(totp.GenerateOpts{
-				Issuer:      issuer,
-				AccountName: addr.String() + "@" + issuer,
-			})
-			if oerr != nil {
-				return oerr
-			}
-			display(otpKey)
-
-			for {
-				passcode, err = PromptForAuth("OTP Application Passcode", false, addr)
-				if err != nil {
-					return err
-				}
-				valid := totp.Validate(string(passcode), otpKey.Secret())
-				if !valid {
-					fmt.Println("OTP Application Passcode Invalid!")
-					continue
-				}
-				fmt.Println("OTP Application Passcode Valid!")
-				otpUrl = []byte(otpKey.URL())
-				break
-			}
-		}
-
-		err = api.WalletEncrypt(ctx, addr, passwd, newPasswd, passcode, otpUrl)
-		if err != nil {
-			return err
-		}
-		fmt.Printf("%v encrypt success\n", addr)
-		return nil
-	},
-}
-
 func display(key *otp.Key) error {
 	fmt.Printf("Issuer:       %s\n", key.Issuer())
 	fmt.Printf("Account Name: %s\n", key.AccountName())
@@ -437,8 +336,6 @@ var walletExport = &cli.Command{
 		if err != nil {
 			return err
 		}
-
-		CheckAuth(ctx, srv, addr)
 
 		ki, err := api.WalletExport(ctx, addr)
 		if err != nil {
@@ -600,7 +497,6 @@ var walletSign = &cli.Command{
 			return err
 		}
 
-		CheckAuth(ctx, srv, addr)
 		sig, err := api.WalletSign(ctx, addr, msg)
 
 		if err != nil {
@@ -693,10 +589,6 @@ var walletDelete = &cli.Command{
 
 		fmt.Println("Soft deleting address:", addr)
 		fmt.Println("Hard deletion of the address in `~/.lotus/keystore` is needed for permanent removal")
-		err = CheckAuth(ctx, srv, addr)
-		if err != nil {
-			return err
-		}
 		return api.WalletDelete(ctx, addr)
 	},
 }
@@ -810,7 +702,6 @@ var walletMarketWithdraw = &cli.Command{
 			return notEnoughErr(msg)
 		}
 
-		CheckAuth(ctx, srv, addr)
 		fmt.Printf("Submitting WithdrawBalance message for amount %s for address %s\n", types.FIL(amt), wallet.String())
 		smsg, err := api.MarketWithdraw(ctx, wallet, addr, amt)
 		if err != nil {
@@ -913,7 +804,6 @@ var walletMarketAdd = &cli.Command{
 			}
 		}
 
-		CheckAuth(ctx, srv, addr)
 		// Add balance to market actor
 		fmt.Printf("Submitting Add Balance message for amount %s for address %s\n", types.FIL(amt), addr)
 		smsg, err := api.MarketAddBalance(ctx, from, addr, amt)
