@@ -38,7 +38,7 @@ func main() {
 			&cli.BoolFlag{
 				Name:  "calibnet",
 				Usage: "",
-				Value: false,
+				Value: true,
 			},
 		},
 		Before: func(cctx *cli.Context) error {
