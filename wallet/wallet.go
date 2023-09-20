@@ -3,6 +3,9 @@ package wallet
 import (
 	"context"
 	"encoding/json"
+	wallet2 "offline-wallet/chain/wallet"
+	"strings"
+
 	"github.com/filecoin-project/go-address"
 	"github.com/filecoin-project/go-state-types/abi"
 	"github.com/filecoin-project/go-state-types/big"
@@ -22,8 +25,6 @@ import (
 	"github.com/ipfs/go-datastore"
 	logging "github.com/ipfs/go-log/v2"
 	"golang.org/x/xerrors"
-	"strings"
-	wallet2 "offline-wallet/chain/wallet"
 )
 
 var log = logging.Logger("wallet")
@@ -32,7 +33,6 @@ type ShedWallet struct {
 	LocalWallet *wallet2.LocalWallet
 	*MsigAPI
 	MessageSigner *messagesigner.MessageSigner
-	//FMgr *market.FundManager
 }
 
 func (sw *ShedWallet) withdrawBalance(ctx context.Context, maddr address.Address, amount abi.TokenAmount, fromOwner bool) (cid.Cid, error) {
@@ -105,6 +105,10 @@ func (sw *ShedWallet) WalletSign(ctx context.Context, keyAddr address.Address, m
 		Type: api.MTUnknown,
 	})
 }
+
+// func (sw *ShedWallet) WalletBalance(ctx context.Context, keyAddr address.Address) (types.BigInt, error) {
+// 	return sw.LocalWallet.walletBalance(ctx, keyAddr)
+// }
 
 func (sw *ShedWallet) WalletNew(ctx context.Context, keyType types.KeyType) (address.Address, error) {
 	return sw.LocalWallet.WalletNew(ctx, keyType)

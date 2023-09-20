@@ -25,9 +25,9 @@ import (
 var log = logging.Logger("cli")
 
 func GetWalletAPI(ctx *cli.Context) (ServicesAPI, error) {
-	var isTest bool = false
+	var isTest bool = true
 	networkName := build2.NetworkName
-	if networkName == "test" {
+	if networkName == "main" {
 		isTest = false
 	}
 

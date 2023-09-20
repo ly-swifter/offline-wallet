@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+
 	"github.com/filecoin-project/go-address"
 	"github.com/filecoin-project/go-state-types/abi"
 	"github.com/filecoin-project/go-state-types/crypto"
@@ -28,6 +29,7 @@ type ShedWallet interface {
 	WalletExport(context.Context, address.Address) (*types.KeyInfo, error)
 	WalletImport(context.Context, *types.KeyInfo) (address.Address, error)
 	WalletSetDefault(context.Context, address.Address) error
+	// WalletBalance(context.Context, address.Address) (types.BigInt, error)
 	WalletDelete(context.Context, address.Address) error
 	MarketWithdraw(ctx context.Context, wallet, addr address.Address, amt types.BigInt) (cid.Cid, error)
 	MarketAddBalance(ctx context.Context, wallet, addr address.Address, amt types.BigInt) (cid.Cid, error)
