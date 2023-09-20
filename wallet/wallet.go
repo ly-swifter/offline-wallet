@@ -3,7 +3,6 @@ package wallet
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	wallet2 "offline-wallet/chain/wallet"
 	"strings"
 
@@ -222,7 +221,15 @@ func (sw *ShedWallet) MpoolPushMessage(ctx context.Context, msg *types.Message, 
 		return nil, xerrors.Errorf("mpool push: not enough funds: %s < %s", b, requiredFunds)
 	}
 
-	fmt.Printf("msg: %+v\n", msg)
+	fromA, err := sw.StateAccountKey(ctx, msg.From, types.EmptyTSK)
+	if err != nil {
+		return nil, err
+	}
+
+	if msg.From.Protocol() == address.ID {
+		log.Warnf("Push from ID address (%s), adjusting to %s", msg.From, fromA)
+		msg.From = fromA
+	}
 
 	signedMsg, err := sw.MessageSigner.SignMessage(ctx, msg, spec, func(message *types.SignedMessage) error {
 		_, err = sw.Gateway.MpoolPush(ctx, message)
