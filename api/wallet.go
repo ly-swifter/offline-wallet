@@ -28,6 +28,7 @@ type ShedWallet interface {
 	WalletDefaultAddress(context.Context) (address.Address, error)
 	WalletExport(context.Context, address.Address) (*types.KeyInfo, error)
 	WalletImport(context.Context, *types.KeyInfo) (address.Address, error)
+	WalletImportId(context.Context, *types.KeyInfo, address.Address) (address.Address, error)
 	WalletSetDefault(context.Context, address.Address) error
 	// WalletBalance(context.Context, address.Address) (types.BigInt, error)
 	WalletDelete(context.Context, address.Address) error

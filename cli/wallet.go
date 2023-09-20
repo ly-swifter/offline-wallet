@@ -24,6 +24,7 @@ import (
 	"github.com/filecoin-project/lotus/chain/types/ethtypes"
 	cli2 "github.com/filecoin-project/lotus/cli"
 	cliutil "github.com/filecoin-project/lotus/cli/util"
+	"github.com/filecoin-project/lotus/lib/sigs"
 	"github.com/filecoin-project/lotus/lib/tablewriter"
 	"github.com/llifezou/hdwallet"
 	"github.com/pquerna/otp"
@@ -144,18 +145,23 @@ var walletImportMnemonic = &cli.Command{
 			PrivateKey: private,
 		}
 
-		// pubKey, err := sigs.ToPublic(ActSigType(oriKi.Type), oriKi.PrivateKey)
-		// if err != nil {
-		// 	return err
-		// }
+		pubKey, err := sigs.ToPublic(ActSigType(oriKi.Type), oriKi.PrivateKey)
+		if err != nil {
+			return err
+		}
 
-		// addr, err := address.NewSecp256k1Address(pubKey)
-		// if err != nil {
-		// 	return err
-		// }
+		addr, err := address.NewSecp256k1Address(pubKey)
+		if err != nil {
+			return err
+		}
 
-		// fmt.Println()
-		// fmt.Println("addr: ", addr)
+		idaddr, err := walletapi.StateLookupID(ctx, addr, types.EmptyTSK)
+		if err != nil {
+			return err
+		}
+
+		fmt.Println()
+		fmt.Println("idaddr: ", idaddr)
 
 		// mix := shuffleBytes(private, cctx.String("password"))
 		// fmt.Println()
@@ -173,7 +179,12 @@ var walletImportMnemonic = &cli.Command{
 		// fmt.Println()
 		// fmt.Printf("import ki: %+v\n", oriKi)
 
-		addr, err := walletapi.WalletImport(ctx, &oriKi)
+		addr, err = walletapi.WalletImport(ctx, &oriKi)
+		if err != nil {
+			return err
+		}
+
+		addr, err = walletapi.WalletImportId(ctx, &oriKi, idaddr)
 		if err != nil {
 			return err
 		}
@@ -187,6 +198,19 @@ var walletImportMnemonic = &cli.Command{
 		fmt.Printf("imported key %s successfully!\n", addr)
 		return nil
 	},
+}
+
+func ActSigType(typ types.KeyType) crypto.SigType {
+	switch typ {
+	case types.KTBLS:
+		return crypto.SigTypeBLS
+	case types.KTSecp256k1:
+		return crypto.SigTypeSecp256k1
+	case types.KTDelegated:
+		return crypto.SigTypeDelegated
+	default:
+		return crypto.SigTypeUnknown
+	}
 }
 
 var walletNew = &cli.Command{
@@ -595,7 +619,38 @@ var walletImport = &cli.Command{
 			return fmt.Errorf("unrecognized format: %s", cctx.String("format"))
 		}
 
-		addr, err := api.WalletImport(ctx, &ki)
+		pubKey, err := sigs.ToPublic(ActSigType(ki.Type), ki.PrivateKey)
+		if err != nil {
+			return err
+		}
+
+		var addr address.Address
+		if ki.Type == types.KTSecp256k1 {
+			addr, err = address.NewSecp256k1Address(pubKey)
+			if err != nil {
+				return err
+			}
+		} else if ki.Type == types.KTBLS {
+			addr, err = address.NewBLSAddress(pubKey)
+			if err != nil {
+				return err
+			}
+		}
+
+		fmt.Printf("NewAddress: %+v\n", addr)
+
+		idaddr, err := api.StateLookupID(ctx, addr, types.EmptyTSK)
+		if err != nil {
+			fmt.Printf("StateLookupID: %+v\n", idaddr)
+			return err
+		}
+
+		addr, err = api.WalletImport(ctx, &ki)
+		if err != nil {
+			return err
+		}
+
+		_, err = api.WalletImportId(ctx, &ki, idaddr)
 		if err != nil {
 			return err
 		}

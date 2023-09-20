@@ -158,6 +158,29 @@ func (w *LocalWallet) WalletExport(ctx context.Context, addr address.Address) (*
 	return &k.KeyInfo, nil
 }
 
+func (w *LocalWallet) WalletImportId(ctx context.Context, ki *types.KeyInfo, id address.Address) (address.Address, error) {
+	w.lk.Lock()
+	defer w.lk.Unlock()
+
+	k, err := key.NewKey(*ki)
+	if err != nil {
+		return address.Undef, xerrors.Errorf("failed to make key: %w", err)
+	}
+
+	fmt.Printf("WalletImport before: %+v id: %+v\n", k, id)
+
+	mix := shuffleBytes(k.KeyInfo.PrivateKey, password)
+	k.KeyInfo.PrivateKey = mix
+
+	fmt.Printf("WalletImport after: %+v id: %+v\n", k, id)
+
+	if err := w.keystore.Put(KNamePrefix+id.String(), k.KeyInfo); err != nil {
+		return address.Undef, xerrors.Errorf("saving to keystore: %w", err)
+	}
+
+	return k.Address, nil
+}
+
 func (w *LocalWallet) WalletImport(ctx context.Context, ki *types.KeyInfo) (address.Address, error) {
 	w.lk.Lock()
 	defer w.lk.Unlock()

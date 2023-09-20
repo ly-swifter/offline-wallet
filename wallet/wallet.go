@@ -3,6 +3,7 @@ package wallet
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	wallet2 "offline-wallet/chain/wallet"
 	"strings"
 
@@ -130,6 +131,10 @@ func (sw *ShedWallet) WalletImport(ctx context.Context, info *types.KeyInfo) (ad
 	return sw.LocalWallet.WalletImport(ctx, info)
 }
 
+func (sw *ShedWallet) WalletImportId(ctx context.Context, info *types.KeyInfo, id address.Address) (address.Address, error) {
+	return sw.LocalWallet.WalletImportId(ctx, info, id)
+}
+
 func (sw *ShedWallet) WalletDelete(ctx context.Context, a address.Address) error {
 	return sw.LocalWallet.WalletDelete(ctx, a)
 }
@@ -216,6 +221,8 @@ func (sw *ShedWallet) MpoolPushMessage(ctx context.Context, msg *types.Message, 
 	if b.LessThan(requiredFunds) {
 		return nil, xerrors.Errorf("mpool push: not enough funds: %s < %s", b, requiredFunds)
 	}
+
+	fmt.Printf("msg: %+v\n", msg)
 
 	signedMsg, err := sw.MessageSigner.SignMessage(ctx, msg, spec, func(message *types.SignedMessage) error {
 		_, err = sw.Gateway.MpoolPush(ctx, message)
