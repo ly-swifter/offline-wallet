@@ -1,9 +1,10 @@
 package main
 
 import (
+	"os"
+
 	logging "github.com/ipfs/go-log/v2"
 	"github.com/urfave/cli/v2"
-	"os"
 
 	"offline-wallet/build"
 	cli_off "offline-wallet/cli"
@@ -15,6 +16,7 @@ func main() {
 	local := []*cli.Command{
 		initCmd,
 		cli_off.WalletCmd,
+		cli_off.ActorWithdrawCmd,
 	}
 
 	app := &cli.App{

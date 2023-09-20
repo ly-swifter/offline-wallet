@@ -6,7 +6,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/fatih/color"
@@ -24,8 +26,11 @@ import (
 	cliutil "github.com/filecoin-project/lotus/cli/util"
 	"github.com/filecoin-project/lotus/lib/tablewriter"
 	"github.com/howeyc/gopass"
+	"github.com/llifezou/hdwallet"
 	"github.com/pquerna/otp"
+	"github.com/tyler-smith/go-bip39"
 	"github.com/urfave/cli/v2"
+	"golang.org/x/term"
 	"golang.org/x/xerrors"
 )
 
@@ -39,12 +44,148 @@ var WalletCmd = &cli.Command{
 		walletBalance,
 		walletExport,
 		walletImport,
+		walletGenerateMnemonic,
 		walletGetDefault,
 		walletSetDefault,
 		walletSign,
 		walletVerify,
 		walletDelete,
 		walletMarket,
+	},
+}
+
+var walletGenerateMnemonic = &cli.Command{
+	Name:  "generateMnemonic",
+	Usage: "generate mnemonic words",
+	Action: func(cctx *cli.Context) error {
+		_ = cli2.ReqContext(cctx)
+
+		mnemonic, err := hdwallet.NewMnemonic(hdwallet.Mnemonic24)
+		if err != nil {
+			return err
+		}
+
+		fmt.Printf("mnemonic: %s\n", mnemonic)
+		return nil
+	},
+}
+
+var walletImportMnemonic = &cli.Command{
+	Name:      "importMnemonic",
+	Usage:     "import mnemonic words",
+	ArgsUsage: "[<path> (optional, will read from stdin if omitted)]",
+	Flags: []cli.Flag{
+		// &cli.StringFlag{
+		// 	Name:  "password",
+		// 	Usage: "this is the 10 characters password for shuffling the origin private key",
+		// 	Value: "",
+		// },
+		&cli.BoolFlag{
+			Name:  "as-default",
+			Usage: "import the given key as your new default key",
+		},
+	},
+	Action: func(cctx *cli.Context) error {
+		api, err := GetWalletAPI(cctx)
+		if err != nil {
+			return err
+		}
+
+		walletapi := api.WalletAPI()
+		// defer closer()
+
+		ctx := cli2.ReqContext(cctx)
+
+		var inpdata []byte
+		var private []byte
+		if !cctx.Args().Present() || cctx.Args().First() == "-" {
+			if term.IsTerminal(int(os.Stdin.Fd())) {
+				fmt.Print("Enter private key(not display in the terminal): ")
+
+				sigCh := make(chan os.Signal, 1)
+				// Notify the channel when SIGINT is received
+				signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
+
+				go func() {
+					<-sigCh
+					fmt.Println("\nInterrupt signal received. Exiting...")
+					os.Exit(1)
+				}()
+
+				inpdata, err = term.ReadPassword(int(os.Stdin.Fd()))
+				if err != nil {
+					return err
+				}
+
+				fmt.Println()
+				fmt.Printf("inpdata: %s\n", string(inpdata))
+				fmt.Println()
+
+				mnemonic := strings.TrimSpace(string(inpdata))
+
+				// Generate a Bip32 HD wallet for the mnemonic and a user supplied password
+				seed := bip39.NewSeed(mnemonic, "")
+				fmt.Printf("seed: %s", hex.EncodeToString(seed))
+
+				pri, err := hdwallet.GetExtendSeedFromPath(hdwallet.FilPath(0), seed)
+				if err != nil {
+					return err
+				}
+
+				private = pri
+			}
+		}
+
+		fmt.Println()
+		fmt.Println("private: ", private)
+
+		var oriKi types.KeyInfo = types.KeyInfo{
+			Type:       types.KTSecp256k1,
+			PrivateKey: private,
+		}
+
+		// pubKey, err := sigs.ToPublic(ActSigType(oriKi.Type), oriKi.PrivateKey)
+		// if err != nil {
+		// 	return err
+		// }
+
+		// addr, err := address.NewSecp256k1Address(pubKey)
+		// if err != nil {
+		// 	return err
+		// }
+
+		// fmt.Println()
+		// fmt.Println("addr: ", addr)
+
+		// mix := shuffleBytes(private, cctx.String("password"))
+		// fmt.Println()
+		// fmt.Println("mix: ", mix)
+
+		// unmix := unshuffleBytes(mix, cctx.String("password"))
+		// fmt.Println("unmix: ", unmix)
+		fmt.Println()
+
+		// var ki types.KeyInfo = types.KeyInfo{
+		// 	Type:       types.KTSecp256k1,
+		// 	PrivateKey: mix,
+		// }
+
+		// fmt.Println()
+		// fmt.Printf("import ki: %+v\n", oriKi)
+
+		addr, err := walletapi.WalletImport(ctx, &oriKi)
+		if err != nil {
+			return err
+		}
+
+		if cctx.Bool("as-default") {
+			if err := walletapi.WalletSetDefault(ctx, addr); err != nil {
+				return fmt.Errorf("failed to set default key: %w", err)
+			}
+		}
+
+		fmt.Printf("imported key %s successfully!\n", addr)
+		return nil
 	},
 }
 

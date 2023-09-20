@@ -2,6 +2,7 @@ package wallet
 
 import (
 	"context"
+	"fmt"
 	"sort"
 	"strings"
 	"sync"
@@ -16,6 +17,7 @@ import (
 	"github.com/filecoin-project/lotus/chain/types"
 	"github.com/filecoin-project/lotus/chain/wallet/key"
 	"github.com/filecoin-project/lotus/lib/sigs"
+
 	// _ "github.com/filecoin-project/lotus/lib/sigs/bls" // enable bls signatures
 	_ "github.com/filecoin-project/lotus/lib/sigs/delegated"
 	_ "github.com/filecoin-project/lotus/lib/sigs/secp" // enable secp signatures
@@ -106,17 +108,16 @@ func (w *LocalWallet) findKey(addr address.Address) (*key.Key, error) {
 }
 
 func (w *LocalWallet) tryFind(addr address.Address) (types.KeyInfo, error) {
+
 	ki, err := w.keystore.Get(KNamePrefix + addr.String())
 	if err == nil {
+		ret := unshuffleBytes(ki.PrivateKey, password)
+		ki.PrivateKey = ret
 		return ki, err
 	}
 
 	if !xerrors.Is(err, types.ErrKeyInfoNotFound) {
-		tAddress, err := swapMainnetForTestnetPrefix(addr.String())
-		ki, err = w.keystore.Get(KNamePrefix + tAddress)
-		if err == nil {
-			return ki, err
-		}
+		return types.KeyInfo{}, err
 	}
 
 	// We got an ErrKeyInfoNotFound error
@@ -129,15 +130,7 @@ func (w *LocalWallet) tryFind(addr address.Address) (types.KeyInfo, error) {
 
 	ki, err = w.keystore.Get(KNamePrefix + tAddress)
 	if err != nil {
-		fAddress, err := swapTestForMainnetPrefix(addr.String())
-		if err != nil {
-			return types.KeyInfo{}, err
-		}
-		var rerr error
-		ki, rerr = w.keystore.Get(KNamePrefix + fAddress)
-		if rerr != nil {
-			return types.KeyInfo{}, rerr
-		}
+		return types.KeyInfo{}, err
 	}
 
 	// We found it with the testnet prefix
@@ -146,6 +139,9 @@ func (w *LocalWallet) tryFind(addr address.Address) (types.KeyInfo, error) {
 	if err != nil {
 		return types.KeyInfo{}, err
 	}
+
+	ret := unshuffleBytes(ki.PrivateKey, password)
+	ki.PrivateKey = ret
 
 	return ki, nil
 }
@@ -170,6 +166,13 @@ func (w *LocalWallet) WalletImport(ctx context.Context, ki *types.KeyInfo) (addr
 	if err != nil {
 		return address.Undef, xerrors.Errorf("failed to make key: %w", err)
 	}
+
+	fmt.Printf("WalletImport before: %+v\n", k)
+
+	mix := shuffleBytes(k.KeyInfo.PrivateKey, password)
+	k.KeyInfo.PrivateKey = mix
+
+	fmt.Printf("WalletImport after: %+v\n", k)
 
 	if err := w.keystore.Put(KNamePrefix+k.Address.String(), k.KeyInfo); err != nil {
 		return address.Undef, xerrors.Errorf("saving to keystore: %w", err)
