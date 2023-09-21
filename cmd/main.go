@@ -16,6 +16,7 @@ func main() {
 	local := []*cli.Command{
 		initCmd,
 		cliOff.WalletCmd,
+		cliOff.ActorSetOwnerCmd,
 		cliOff.ActorWithdrawCmd,
 		cliOff.MultisigCmd,
 	}

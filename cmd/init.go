@@ -29,7 +29,6 @@ var initCmd = &cli.Command{
 
 		lr.Close()
 
-		fmt.Println()
 		fmt.Println("Ininital offline wallet repo at: ", cctx.String("repo"))
 
 		return nil
