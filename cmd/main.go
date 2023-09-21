@@ -7,7 +7,7 @@ import (
 	"github.com/urfave/cli/v2"
 
 	"offline-wallet/build"
-	cli_off "offline-wallet/cli"
+	cliOff "offline-wallet/cli"
 )
 
 var log = logging.Logger("offline-wallet")
@@ -15,8 +15,9 @@ var log = logging.Logger("offline-wallet")
 func main() {
 	local := []*cli.Command{
 		initCmd,
-		cli_off.WalletCmd,
-		cli_off.ActorWithdrawCmd,
+		cliOff.WalletCmd,
+		cliOff.ActorWithdrawCmd,
+		cliOff.MultisigCmd,
 	}
 
 	app := &cli.App{
