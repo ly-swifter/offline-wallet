@@ -46,38 +46,45 @@ var ActorSetOwnerCmd = &cli.Command{
 
 		ctx := lcli.ReqContext(cctx)
 
+		// miner address
 		maddr, err := address.NewFromString(cctx.Args().First())
 		if err != nil {
 			return err
 		}
 
+		// new owner address
 		na, err := address.NewFromString(cctx.Args().Get(1))
 		if err != nil {
 			return err
 		}
 
+		// new owner id address
 		newAddrId, err := api.StateLookupID(ctx, na, types.EmptyTSK)
 		if err != nil {
 			return err
 		}
 
+		// from address
 		fa, err := address.NewFromString(cctx.Args().Get(2))
 		if err != nil {
 			return err
 		}
 
+		// from id address
 		fromAddrId, err := api.StateLookupID(ctx, fa, types.EmptyTSK)
 		if err != nil {
 			return err
 		}
 
-		mi, err := api.StateMinerInfo(ctx, maddr, types.EmptyTSK)
-		if err != nil {
-			return err
-		}
+		// miner info
+		// mi, err := api.StateMinerInfo(ctx, maddr, types.EmptyTSK)
+		// if err != nil {
+		// 	return err
+		// }
 
-		if fromAddrId != mi.Owner && fromAddrId != newAddrId {
-			return xerrors.New("from address must either be the old owner or the new owner")
+		// forbid change owner to another address
+		if fromAddrId != newAddrId {
+			return xerrors.New("from address must either be a new owner")
 		}
 
 		sp, err := actors.SerializeParams(&newAddrId)
