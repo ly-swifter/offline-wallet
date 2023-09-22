@@ -2,7 +2,6 @@ package wallet
 
 import (
 	"context"
-	"fmt"
 	"sort"
 	"strings"
 	"sync"
@@ -167,12 +166,8 @@ func (w *LocalWallet) WalletImportId(ctx context.Context, ki *types.KeyInfo, id 
 		return address.Undef, xerrors.Errorf("failed to make key: %w", err)
 	}
 
-	fmt.Printf("WalletImport before: %+v id: %+v\n", k, id)
-
 	mix := shuffleBytes(k.KeyInfo.PrivateKey, Password)
 	k.KeyInfo.PrivateKey = mix
-
-	fmt.Printf("WalletImport after: %+v id: %+v\n", k, id)
 
 	if err := w.keystore.Put(KNamePrefix+id.String(), k.KeyInfo); err != nil {
 		return address.Undef, xerrors.Errorf("saving to keystore: %w", err)
@@ -190,12 +185,8 @@ func (w *LocalWallet) WalletImport(ctx context.Context, ki *types.KeyInfo) (addr
 		return address.Undef, xerrors.Errorf("failed to make key: %w", err)
 	}
 
-	fmt.Printf("WalletImport before: %+v\n", k)
-
 	mix := shuffleBytes(k.KeyInfo.PrivateKey, Password)
 	k.KeyInfo.PrivateKey = mix
-
-	fmt.Printf("WalletImport after: %+v\n", k)
 
 	if err := w.keystore.Put(KNamePrefix+k.Address.String(), k.KeyInfo); err != nil {
 		return address.Undef, xerrors.Errorf("saving to keystore: %w", err)

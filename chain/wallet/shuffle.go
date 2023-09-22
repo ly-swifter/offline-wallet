@@ -2,7 +2,6 @@ package wallet
 
 import (
 	"crypto/sha256"
-	"fmt"
 )
 
 const Password = "xxxxxxxxxx"
@@ -55,10 +54,6 @@ func generateArrayFromKey(key string) [32]int {
 		numbers[i] = modValue
 		isUsed[modValue] = true
 	}
-
-	fmt.Println()
-	fmt.Println("numbers: ", numbers)
-	fmt.Println()
 
 	return numbers
 }
