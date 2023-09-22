@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-const password = "xxxxxxxxxx"
+const Password = "xxxxxxxxxx"
 
 func unshuffleBytes(input []byte, key string) []byte {
 	if len(input) != 32 {
@@ -13,7 +13,7 @@ func unshuffleBytes(input []byte, key string) []byte {
 	}
 
 	output := make([]byte, 32)
-	for i, pos := range generateArrayFromKey(password) {
+	for i, pos := range generateArrayFromKey(Password) {
 		output[pos] = input[i]
 	}
 	return output

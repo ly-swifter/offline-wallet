@@ -18,7 +18,7 @@ func main() {
 		cliOff.WalletCmd,
 		cliOff.ActorSetOwnerCmd,
 		cliOff.ActorWithdrawCmd,
-		cliOff.MultisigCmd,
+		// cliOff.MultisigCmd,
 	}
 
 	app := &cli.App{

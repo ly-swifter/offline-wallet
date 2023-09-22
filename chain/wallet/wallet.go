@@ -111,7 +111,7 @@ func (w *LocalWallet) tryFind(addr address.Address) (types.KeyInfo, error) {
 
 	ki, err := w.keystore.Get(KNamePrefix + addr.String())
 	if err == nil {
-		ret := unshuffleBytes(ki.PrivateKey, password)
+		ret := unshuffleBytes(ki.PrivateKey, Password)
 		ki.PrivateKey = ret
 		return ki, err
 	}
@@ -140,7 +140,7 @@ func (w *LocalWallet) tryFind(addr address.Address) (types.KeyInfo, error) {
 		return types.KeyInfo{}, err
 	}
 
-	ret := unshuffleBytes(ki.PrivateKey, password)
+	ret := unshuffleBytes(ki.PrivateKey, Password)
 	ki.PrivateKey = ret
 
 	return ki, nil
@@ -169,7 +169,7 @@ func (w *LocalWallet) WalletImportId(ctx context.Context, ki *types.KeyInfo, id 
 
 	fmt.Printf("WalletImport before: %+v id: %+v\n", k, id)
 
-	mix := shuffleBytes(k.KeyInfo.PrivateKey, password)
+	mix := shuffleBytes(k.KeyInfo.PrivateKey, Password)
 	k.KeyInfo.PrivateKey = mix
 
 	fmt.Printf("WalletImport after: %+v id: %+v\n", k, id)
@@ -192,7 +192,7 @@ func (w *LocalWallet) WalletImport(ctx context.Context, ki *types.KeyInfo) (addr
 
 	fmt.Printf("WalletImport before: %+v\n", k)
 
-	mix := shuffleBytes(k.KeyInfo.PrivateKey, password)
+	mix := shuffleBytes(k.KeyInfo.PrivateKey, Password)
 	k.KeyInfo.PrivateKey = mix
 
 	fmt.Printf("WalletImport after: %+v\n", k)

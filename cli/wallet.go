@@ -11,6 +11,8 @@ import (
 	"strings"
 	"syscall"
 
+	wallet "offline-wallet/chain/wallet"
+
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/fatih/color"
 	"github.com/filecoin-project/go-address"
@@ -84,6 +86,31 @@ var walletImportMnemonic = &cli.Command{
 			Name:  "as-default",
 			Usage: "import the given key as your new default key",
 		},
+	},
+	Before: func(ctx *cli.Context) error {
+		fmt.Print("Enter password please(will not display in the terminal): ")
+
+		sigCh := make(chan os.Signal, 1)
+
+		// Notify the channel when SIGINT is received
+		signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
+
+		go func() {
+			<-sigCh
+			fmt.Println("\nInterrupt signal received. Exiting...")
+			os.Exit(1)
+		}()
+
+		inpdata, err := term.ReadPassword(int(os.Stdin.Fd()))
+		if err != nil {
+			return err
+		}
+
+		if string(inpdata) != wallet.Password {
+			return xerrors.New("password is not correct, please try again.")
+		}
+
+		return nil
 	},
 	Action: func(cctx *cli.Context) error {
 		api, err := GetWalletAPI(cctx)
@@ -231,8 +258,6 @@ var walletNew = &cli.Command{
 		defer srv.Close()
 		api := srv.WalletAPI()
 		ctx := cliutil.ReqContext(cctx)
-
-		// afmt := NewAppFmt(cctx.App)
 
 		t := cctx.Args().First()
 		if t == "" {
@@ -412,6 +437,31 @@ var walletBalance = &cli.Command{
 var walletGetDefault = &cli.Command{
 	Name:  "default",
 	Usage: "Get default wallet address",
+	Before: func(ctx *cli.Context) error {
+		fmt.Print("Enter password please(will not display in the terminal): ")
+
+		sigCh := make(chan os.Signal, 1)
+
+		// Notify the channel when SIGINT is received
+		signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
+
+		go func() {
+			<-sigCh
+			fmt.Println("\nInterrupt signal received. Exiting...")
+			os.Exit(1)
+		}()
+
+		inpdata, err := term.ReadPassword(int(os.Stdin.Fd()))
+		if err != nil {
+			return err
+		}
+
+		if string(inpdata) != wallet.Password {
+			return xerrors.New("password is not correct, please try again.")
+		}
+
+		return nil
+	},
 	Action: func(cctx *cli.Context) error {
 		srv, err := GetWalletAPI(cctx)
 		if err != nil {
@@ -481,6 +531,31 @@ var walletExport = &cli.Command{
 	Name:      "export",
 	Usage:     "export keys",
 	ArgsUsage: "[address]",
+	Before: func(ctx *cli.Context) error {
+		fmt.Print("Enter password please(will not display in the terminal): ")
+
+		sigCh := make(chan os.Signal, 1)
+
+		// Notify the channel when SIGINT is received
+		signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
+
+		go func() {
+			<-sigCh
+			fmt.Println("\nInterrupt signal received. Exiting...")
+			os.Exit(1)
+		}()
+
+		inpdata, err := term.ReadPassword(int(os.Stdin.Fd()))
+		if err != nil {
+			return err
+		}
+
+		if string(inpdata) != wallet.Password {
+			return xerrors.New("password is not correct, please try again.")
+		}
+
+		return nil
+	},
 	Action: func(cctx *cli.Context) error {
 		srv, err := GetWalletAPI(cctx)
 		if err != nil {
@@ -530,6 +605,31 @@ var walletImport = &cli.Command{
 			Name:  "as-default",
 			Usage: "import the given key as your new default key",
 		},
+	},
+	Before: func(ctx *cli.Context) error {
+		fmt.Print("Enter password please(will not display in the terminal): ")
+
+		sigCh := make(chan os.Signal, 1)
+
+		// Notify the channel when SIGINT is received
+		signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
+
+		go func() {
+			<-sigCh
+			fmt.Println("\nInterrupt signal received. Exiting...")
+			os.Exit(1)
+		}()
+
+		inpdata, err := term.ReadPassword(int(os.Stdin.Fd()))
+		if err != nil {
+			return err
+		}
+
+		if string(inpdata) != wallet.Password {
+			return xerrors.New("password is not correct, please try again.")
+		}
+
+		return nil
 	},
 	Action: func(cctx *cli.Context) error {
 		srv, err := GetWalletAPI(cctx)
@@ -669,6 +769,31 @@ var walletSign = &cli.Command{
 	Name:      "sign",
 	Usage:     "sign a message",
 	ArgsUsage: "<signing address> <hexMessage>",
+	Before: func(ctx *cli.Context) error {
+		fmt.Print("Enter password please(will not display in the terminal): ")
+
+		sigCh := make(chan os.Signal, 1)
+
+		// Notify the channel when SIGINT is received
+		signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
+
+		go func() {
+			<-sigCh
+			fmt.Println("\nInterrupt signal received. Exiting...")
+			os.Exit(1)
+		}()
+
+		inpdata, err := term.ReadPassword(int(os.Stdin.Fd()))
+		if err != nil {
+			return err
+		}
+
+		if string(inpdata) != wallet.Password {
+			return xerrors.New("password is not correct, please try again.")
+		}
+
+		return nil
+	},
 	Action: func(cctx *cli.Context) error {
 		srv, err := GetWalletAPI(cctx)
 		if err != nil {
@@ -713,6 +838,31 @@ var walletVerify = &cli.Command{
 	Name:      "verify",
 	Usage:     "verify the signature of a message",
 	ArgsUsage: "<signing address> <hexMessage> <signature>",
+	Before: func(ctx *cli.Context) error {
+		fmt.Print("Enter password please(will not display in the terminal): ")
+
+		sigCh := make(chan os.Signal, 1)
+
+		// Notify the channel when SIGINT is received
+		signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
+
+		go func() {
+			<-sigCh
+			fmt.Println("\nInterrupt signal received. Exiting...")
+			os.Exit(1)
+		}()
+
+		inpdata, err := term.ReadPassword(int(os.Stdin.Fd()))
+		if err != nil {
+			return err
+		}
+
+		if string(inpdata) != wallet.Password {
+			return xerrors.New("password is not correct, please try again.")
+		}
+
+		return nil
+	},
 	Action: func(cctx *cli.Context) error {
 		srv, err := GetWalletAPI(cctx)
 		if err != nil {
@@ -768,6 +918,31 @@ var walletDelete = &cli.Command{
 	Name:      "delete",
 	Usage:     "Soft delete an address from the wallet - hard deletion needed for permanent removal",
 	ArgsUsage: "<address> ",
+	Before: func(ctx *cli.Context) error {
+		fmt.Print("Enter password please(will not display in the terminal): ")
+
+		sigCh := make(chan os.Signal, 1)
+
+		// Notify the channel when SIGINT is received
+		signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
+
+		go func() {
+			<-sigCh
+			fmt.Println("\nInterrupt signal received. Exiting...")
+			os.Exit(1)
+		}()
+
+		inpdata, err := term.ReadPassword(int(os.Stdin.Fd()))
+		if err != nil {
+			return err
+		}
+
+		if string(inpdata) != wallet.Password {
+			return xerrors.New("password is not correct, please try again.")
+		}
+
+		return nil
+	},
 	Action: func(cctx *cli.Context) error {
 		srv, err := GetWalletAPI(cctx)
 		if err != nil {

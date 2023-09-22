@@ -3,6 +3,10 @@ package cli
 import (
 	"bytes"
 	"fmt"
+	wallet "offline-wallet/chain/wallet"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/filecoin-project/go-address"
 	"github.com/filecoin-project/go-state-types/abi"
@@ -13,6 +17,7 @@ import (
 	lcli "github.com/filecoin-project/lotus/cli"
 	"github.com/ipfs/go-cid"
 	"github.com/urfave/cli/v2"
+	"golang.org/x/term"
 	"golang.org/x/xerrors"
 )
 
@@ -30,6 +35,31 @@ var ActorWithdrawCmd = &cli.Command{
 			Name:  "beneficiary",
 			Usage: "send withdraw message from the beneficiary address",
 		},
+	},
+	Before: func(ctx *cli.Context) error {
+		fmt.Print("Enter password please(will not display in the terminal): ")
+
+		sigCh := make(chan os.Signal, 1)
+
+		// Notify the channel when SIGINT is received
+		signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
+
+		go func() {
+			<-sigCh
+			fmt.Println("\nInterrupt signal received. Exiting...")
+			os.Exit(1)
+		}()
+
+		inpdata, err := term.ReadPassword(int(os.Stdin.Fd()))
+		if err != nil {
+			return err
+		}
+
+		if string(inpdata) != wallet.Password {
+			return xerrors.New("password is not correct, please try again.")
+		}
+
+		return nil
 	},
 	Action: func(cctx *cli.Context) error {
 		api, err := GetWalletAPI(cctx)
