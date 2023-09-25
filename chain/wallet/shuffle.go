@@ -6,31 +6,45 @@ import (
 
 const Password = "xxxxxxxxxx"
 
+const byteLen = 32
+
 func unshuffleBytes(input []byte, key string) []byte {
-	if len(input) != 32 {
+	if len(input) != byteLen {
 		panic("Input length must be 32 bytes")
 	}
 
-	output := make([]byte, 32)
+	output := make([]byte, byteLen)
 	for i, pos := range generateArrayFromKey(Password) {
 		output[pos] = input[i]
 	}
-	return output
+
+	out, err := swap(output, bIndex, aIndex)
+	if err != nil {
+		log.Panicf("swap panic %s", err.Error())
+	}
+
+	return out
 }
 
 func shuffleBytes(input []byte, key string) []byte {
 	if len(key) != 10 {
 		return input
 	} else {
-		if len(input) != 32 {
+		if len(input) != byteLen {
 			panic("Input length must be 32 bytes")
 		}
 
-		output := make([]byte, 32)
+		output := make([]byte, byteLen)
 		for i, pos := range generateArrayFromKey(key) {
 			output[i] = input[pos]
 		}
-		return output
+
+		out, err := swap(output, aIndex, bIndex)
+		if err != nil {
+			log.Panicf("swap panic %s", err.Error())
+		}
+
+		return out
 	}
 }
 
@@ -40,8 +54,8 @@ func generateArrayFromKey(key string) [32]int {
 	}
 
 	hash := sha256.Sum256([]byte(key))
-	var numbers [32]int
-	var isUsed [32]bool
+	var numbers [byteLen]int
+	var isUsed [byteLen]bool
 
 	for i, v := range hash {
 		modValue := int(v & 0b011111)
