@@ -43,7 +43,7 @@ var WalletCmd = &cli.Command{
 		walletNew,
 		walletList,
 		walletBalance,
-		walletExport,
+		// walletExport,
 		walletImport,
 		walletGenerateMnemonic,
 		walletImportMnemonic,
@@ -511,31 +511,31 @@ var walletExport = &cli.Command{
 			return err
 		}
 		defer srv.Close()
-		api := srv.WalletAPI()
-		ctx := cliutil.ReqContext(cctx)
+		// api := srv.WalletAPI()
+		// ctx := cliutil.ReqContext(cctx)
 
-		afmt := NewAppFmt(cctx.App)
+		// afmt := NewAppFmt(cctx.App)
 
-		if cctx.NArg() != 1 {
-			return IncorrectNumArgs(cctx)
-		}
+		// if cctx.NArg() != 1 {
+		// 	return IncorrectNumArgs(cctx)
+		// }
 
-		addr, err := address.NewFromString(cctx.Args().First())
-		if err != nil {
-			return err
-		}
+		// addr, err := address.NewFromString(cctx.Args().First())
+		// if err != nil {
+		// 	return err
+		// }
 
-		ki, err := api.WalletExport(ctx, addr)
-		if err != nil {
-			return err
-		}
+		// ki, err := api.WalletExport(ctx, addr)
+		// if err != nil {
+		// 	return err
+		// }
 
-		b, err := json.Marshal(ki)
-		if err != nil {
-			return err
-		}
+		// b, err := json.Marshal(ki)
+		// if err != nil {
+		// 	return err
+		// }
 
-		afmt.Println(hex.EncodeToString(b))
+		// afmt.Println(hex.EncodeToString(b))
 		return nil
 	},
 }

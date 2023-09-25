@@ -122,9 +122,9 @@ func (sw *ShedWallet) WalletList(ctx context.Context) ([]address.Address, error)
 	return sw.LocalWallet.WalletList(ctx)
 }
 
-func (sw *ShedWallet) WalletExport(ctx context.Context, a address.Address) (*types.KeyInfo, error) {
-	return sw.LocalWallet.WalletExport(ctx, a)
-}
+// func (sw *ShedWallet) WalletExport(ctx context.Context, a address.Address) (*types.KeyInfo, error) {
+// 	return sw.LocalWallet.WalletExport(ctx, a)
+// }
 
 func (sw *ShedWallet) WalletImport(ctx context.Context, info *types.KeyInfo) (address.Address, error) {
 	return sw.LocalWallet.WalletImport(ctx, info)

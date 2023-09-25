@@ -145,17 +145,17 @@ func (w *LocalWallet) tryFind(addr address.Address) (types.KeyInfo, error) {
 	return ki, nil
 }
 
-func (w *LocalWallet) WalletExport(ctx context.Context, addr address.Address) (*types.KeyInfo, error) {
-	k, err := w.findKey(addr)
-	if err != nil {
-		return nil, xerrors.Errorf("failed to find key to export: %w", err)
-	}
-	if k == nil {
-		return nil, xerrors.Errorf("key not found for %s", addr)
-	}
+// func (w *LocalWallet) WalletExport(ctx context.Context, addr address.Address) (*types.KeyInfo, error) {
+// 	k, err := w.findKey(addr)
+// 	if err != nil {
+// 		return nil, xerrors.Errorf("failed to find key to export: %w", err)
+// 	}
+// 	if k == nil {
+// 		return nil, xerrors.Errorf("key not found for %s", addr)
+// 	}
 
-	return &k.KeyInfo, nil
-}
+// 	return &k.KeyInfo, nil
+// }
 
 func (w *LocalWallet) WalletImportId(ctx context.Context, ki *types.KeyInfo, id address.Address) (address.Address, error) {
 	w.lk.Lock()

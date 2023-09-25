@@ -26,7 +26,7 @@ type ShedWallet interface {
 	GetWalletKey(context.Context, address.Address) (*key.Key, error)
 	WalletVerify(context.Context, address.Address, []byte, *crypto.Signature) (bool, error)
 	WalletDefaultAddress(context.Context) (address.Address, error)
-	WalletExport(context.Context, address.Address) (*types.KeyInfo, error)
+	// WalletExport(context.Context, address.Address) (*types.KeyInfo, error)
 	WalletImport(context.Context, *types.KeyInfo) (address.Address, error)
 	WalletImportId(context.Context, *types.KeyInfo, address.Address) (address.Address, error)
 	WalletSetDefault(context.Context, address.Address) error
