@@ -38,7 +38,6 @@ var ActorWithdrawCmd = &cli.Command{
 	},
 	Before: func(ctx *cli.Context) error {
 		fmt.Print("Enter password please(will not display in the terminal): ")
-		fmt.Println()
 
 		sigCh := make(chan os.Signal, 1)
 
@@ -55,6 +54,8 @@ var ActorWithdrawCmd = &cli.Command{
 		if err != nil {
 			return err
 		}
+
+		fmt.Println()
 
 		if string(inpdata) != wallet.Password {
 			return xerrors.New("password is not correct, please try again.")

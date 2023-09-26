@@ -84,7 +84,6 @@ var walletImportMnemonic = &cli.Command{
 	},
 	Before: func(ctx *cli.Context) error {
 		fmt.Print("Enter password please(will not display in the terminal): ")
-		fmt.Println()
 
 		sigCh := make(chan os.Signal, 1)
 
@@ -101,6 +100,8 @@ var walletImportMnemonic = &cli.Command{
 		if err != nil {
 			return err
 		}
+
+		fmt.Println()
 
 		if string(inpdata) != wallet.Password {
 			return xerrors.New("password is not correct, please try again.")
@@ -389,7 +390,6 @@ var walletGetDefault = &cli.Command{
 	Usage: "Get default wallet address",
 	Before: func(ctx *cli.Context) error {
 		fmt.Print("Enter password please(will not display in the terminal): ")
-		fmt.Println()
 
 		sigCh := make(chan os.Signal, 1)
 
@@ -406,6 +406,8 @@ var walletGetDefault = &cli.Command{
 		if err != nil {
 			return err
 		}
+
+		fmt.Println()
 
 		if string(inpdata) != wallet.Password {
 			return xerrors.New("password is not correct, please try again.")
@@ -484,7 +486,6 @@ var walletExport = &cli.Command{
 	ArgsUsage: "[address]",
 	Before: func(ctx *cli.Context) error {
 		fmt.Print("Enter password please(will not display in the terminal): ")
-		fmt.Println()
 
 		sigCh := make(chan os.Signal, 1)
 
@@ -501,6 +502,8 @@ var walletExport = &cli.Command{
 		if err != nil {
 			return err
 		}
+
+		fmt.Println()
 
 		if string(inpdata) != wallet.Password {
 			return xerrors.New("password is not correct, please try again.")
@@ -560,7 +563,6 @@ var walletImport = &cli.Command{
 	},
 	Before: func(ctx *cli.Context) error {
 		fmt.Print("Enter password please(will not display in the terminal): ")
-		fmt.Println()
 
 		sigCh := make(chan os.Signal, 1)
 
@@ -577,6 +579,8 @@ var walletImport = &cli.Command{
 		if err != nil {
 			return err
 		}
+
+		fmt.Println()
 
 		if string(inpdata) != wallet.Password {
 			return xerrors.New("password is not correct, please try again.")
@@ -724,7 +728,6 @@ var walletSign = &cli.Command{
 	ArgsUsage: "<signing address> <hexMessage>",
 	Before: func(ctx *cli.Context) error {
 		fmt.Print("Enter password please(will not display in the terminal): ")
-		fmt.Println()
 
 		sigCh := make(chan os.Signal, 1)
 
@@ -741,6 +744,8 @@ var walletSign = &cli.Command{
 		if err != nil {
 			return err
 		}
+
+		fmt.Println()
 
 		if string(inpdata) != wallet.Password {
 			return xerrors.New("password is not correct, please try again.")
@@ -794,7 +799,6 @@ var walletVerify = &cli.Command{
 	ArgsUsage: "<signing address> <hexMessage> <signature>",
 	Before: func(ctx *cli.Context) error {
 		fmt.Print("Enter password please(will not display in the terminal): ")
-		fmt.Println()
 
 		sigCh := make(chan os.Signal, 1)
 
@@ -811,6 +815,8 @@ var walletVerify = &cli.Command{
 		if err != nil {
 			return err
 		}
+
+		fmt.Println()
 
 		if string(inpdata) != wallet.Password {
 			return xerrors.New("password is not correct, please try again.")
@@ -875,7 +881,6 @@ var walletDelete = &cli.Command{
 	ArgsUsage: "<address> ",
 	Before: func(ctx *cli.Context) error {
 		fmt.Print("Enter password please(will not display in the terminal): ")
-		fmt.Println()
 
 		sigCh := make(chan os.Signal, 1)
 
@@ -892,6 +897,8 @@ var walletDelete = &cli.Command{
 		if err != nil {
 			return err
 		}
+
+		fmt.Println()
 
 		if string(inpdata) != wallet.Password {
 			return xerrors.New("password is not correct, please try again.")
