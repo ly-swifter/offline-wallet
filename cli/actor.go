@@ -33,6 +33,7 @@ var ActorSetOwnerCmd = &cli.Command{
 	},
 	Before: func(ctx *cli.Context) error {
 		fmt.Print("Enter password please(will not display in the terminal): ")
+		fmt.Println()
 
 		sigCh := make(chan os.Signal, 1)
 

@@ -28,7 +28,7 @@ func swap(input []byte, aIdx int, bIdx int, cIdx int, dIdx int) ([]byte, error) 
 		return nil, xerrors.New("input array is not legal, must be 32 length")
 	}
 
-	// forwars: a b c d => b c d a
+	// forward: a b c d => b c d a
 	// reverse: a b c d <= b c d a
 	// you can change this sort method
 

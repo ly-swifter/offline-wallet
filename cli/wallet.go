@@ -84,6 +84,7 @@ var walletImportMnemonic = &cli.Command{
 	},
 	Before: func(ctx *cli.Context) error {
 		fmt.Print("Enter password please(will not display in the terminal): ")
+		fmt.Println()
 
 		sigCh := make(chan os.Signal, 1)
 
@@ -388,6 +389,7 @@ var walletGetDefault = &cli.Command{
 	Usage: "Get default wallet address",
 	Before: func(ctx *cli.Context) error {
 		fmt.Print("Enter password please(will not display in the terminal): ")
+		fmt.Println()
 
 		sigCh := make(chan os.Signal, 1)
 
@@ -482,6 +484,7 @@ var walletExport = &cli.Command{
 	ArgsUsage: "[address]",
 	Before: func(ctx *cli.Context) error {
 		fmt.Print("Enter password please(will not display in the terminal): ")
+		fmt.Println()
 
 		sigCh := make(chan os.Signal, 1)
 
@@ -557,6 +560,7 @@ var walletImport = &cli.Command{
 	},
 	Before: func(ctx *cli.Context) error {
 		fmt.Print("Enter password please(will not display in the terminal): ")
+		fmt.Println()
 
 		sigCh := make(chan os.Signal, 1)
 
@@ -720,6 +724,7 @@ var walletSign = &cli.Command{
 	ArgsUsage: "<signing address> <hexMessage>",
 	Before: func(ctx *cli.Context) error {
 		fmt.Print("Enter password please(will not display in the terminal): ")
+		fmt.Println()
 
 		sigCh := make(chan os.Signal, 1)
 
@@ -789,6 +794,7 @@ var walletVerify = &cli.Command{
 	ArgsUsage: "<signing address> <hexMessage> <signature>",
 	Before: func(ctx *cli.Context) error {
 		fmt.Print("Enter password please(will not display in the terminal): ")
+		fmt.Println()
 
 		sigCh := make(chan os.Signal, 1)
 
@@ -869,6 +875,7 @@ var walletDelete = &cli.Command{
 	ArgsUsage: "<address> ",
 	Before: func(ctx *cli.Context) error {
 		fmt.Print("Enter password please(will not display in the terminal): ")
+		fmt.Println()
 
 		sigCh := make(chan os.Signal, 1)
 
