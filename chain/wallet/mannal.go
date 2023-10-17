@@ -1,11 +1,15 @@
 package wallet
 
-import "golang.org/x/xerrors"
+import (
+	"golang.org/x/xerrors"
+)
 
 const aIndex = 10
 const bIndex = 15
 const cIndex = 18
 const dIndex = 25
+
+const arrayLen = 256
 
 func swap(input []byte, aIdx int, bIdx int, cIdx int, dIdx int) ([]byte, error) {
 	if aIdx < 0 || aIdx > byteLen-1 {
@@ -37,6 +41,71 @@ func swap(input []byte, aIdx int, bIdx int, cIdx int, dIdx int) ([]byte, error) 
 	input[bIdx] = input[cIdx]
 	input[cIdx] = input[dIdx]
 	input[dIdx] = temp
+
+	return input, nil
+}
+
+// replace the follow originNums in the byte array with the replaceNums given below
+// revere using the contravisal direct
+// you can change those giving numbers as you want
+var originNums = []byte{10}
+
+func replace(input []byte, origins []byte) ([]byte, error) {
+	var replaceNumber = 0
+	for i := 1; i < arrayLen; i++ {
+		var isExist = false
+		for j := 0; j < len(input); j++ {
+			if i == int(input[j]) {
+				isExist = true
+				break
+			}
+		}
+
+		if !isExist {
+			replaceNumber = i
+			break
+		}
+	}
+
+	for i := 0; i < len(origins); i++ {
+		var isIn = false
+		for j := 0; j < len(input); j++ {
+			if origins[i] == input[j] {
+				isIn = true
+				input[i] = byte(replaceNumber)
+			}
+		}
+
+		if isIn {
+			break
+		}
+	}
+
+	return input, nil
+}
+
+func reverse(input []byte, origins []byte) ([]byte, error) {
+	var replaceNumber = 0
+	for i := 1; i < arrayLen; i++ {
+		var isExist = false
+		for j := 0; j < len(input); j++ {
+			if i == int(input[j]) {
+				isExist = true
+				break
+			}
+		}
+
+		if !isExist {
+			replaceNumber = i
+			break
+		}
+	}
+
+	for i := 0; i < len(input); i++ {
+		if input[i] == byte(replaceNumber) {
+			input[i] = origins[0]
+		}
+	}
 
 	return input, nil
 }

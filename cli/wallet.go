@@ -145,7 +145,7 @@ var walletImportMnemonic = &cli.Command{
 
 				// Generate a Bip32 HD wallet for the mnemonic and a user supplied password
 				seed := bip39.NewSeed(mnemonic, "")
-				fmt.Printf("seed: %s", hex.EncodeToString(seed))
+				// fmt.Printf("seed: %s", hex.EncodeToString(seed))
 
 				pri, err := hdwallet.GetExtendSeedFromPath(hdwallet.FilPath(0), seed)
 				if err != nil {
@@ -160,6 +160,8 @@ var walletImportMnemonic = &cli.Command{
 			Type:       types.KTSecp256k1,
 			PrivateKey: private,
 		}
+
+		fmt.Println("pri: ", oriKi.PrivateKey)
 
 		addr, err := walletapi.WalletImport(ctx, &oriKi)
 		if err != nil {

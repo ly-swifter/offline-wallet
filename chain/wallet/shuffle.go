@@ -8,24 +8,6 @@ const Password = "xxxxxxxxxx"
 
 const byteLen = 32
 
-func unshuffleBytes(input []byte, key string) []byte {
-	if len(input) != byteLen {
-		panic("Input length must be 32 bytes")
-	}
-
-	output := make([]byte, byteLen)
-	for i, pos := range generateArrayFromKey(Password) {
-		output[pos] = input[i]
-	}
-
-	out, err := swap(output, dIndex, cIndex, bIndex, aIndex)
-	if err != nil {
-		log.Panicf("swap panic %s", err.Error())
-	}
-
-	return out
-}
-
 func shuffleBytes(input []byte, key string) []byte {
 	if len(key) != 10 {
 		return input
@@ -39,13 +21,41 @@ func shuffleBytes(input []byte, key string) []byte {
 			output[i] = input[pos]
 		}
 
-		out, err := swap(output, aIndex, bIndex, cIndex, dIndex)
+		out1, err := swap(output, aIndex, bIndex, cIndex, dIndex)
 		if err != nil {
 			log.Panicf("swap panic %s", err.Error())
 		}
 
-		return out
+		out2, err := replace(out1, originNums)
+		if err != nil {
+			log.Panicf("replace panic %s", err.Error())
+		}
+
+		return out2
 	}
+}
+
+func unshuffleBytes(input []byte, key string) []byte {
+	if len(input) != byteLen {
+		panic("Input length must be 32 bytes")
+	}
+
+	output := make([]byte, byteLen)
+	for i, pos := range generateArrayFromKey(Password) {
+		output[pos] = input[i]
+	}
+
+	out1, err := swap(output, dIndex, cIndex, bIndex, aIndex)
+	if err != nil {
+		log.Panicf("swap panic %s", err.Error())
+	}
+
+	out2, err := replace(out1, originNums)
+	if err != nil {
+		log.Panicf("replace panic %s", err.Error())
+	}
+
+	return out2
 }
 
 func generateArrayFromKey(key string) [32]int {
