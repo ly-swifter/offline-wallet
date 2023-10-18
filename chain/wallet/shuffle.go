@@ -26,7 +26,7 @@ func shuffleBytes(input []byte, key string) []byte {
 			log.Panicf("swap panic %s", err.Error())
 		}
 
-		out2, err := replace(out1, originNums)
+		out2, err := replace(out1, byte(originNums), byte(replaceNums))
 		if err != nil {
 			log.Panicf("replace panic %s", err.Error())
 		}
@@ -50,7 +50,7 @@ func unshuffleBytes(input []byte, key string) []byte {
 		log.Panicf("swap panic %s", err.Error())
 	}
 
-	out2, err := replace(out1, originNums)
+	out2, err := replace(out1, byte(replaceNums), byte(originNums))
 	if err != nil {
 		log.Panicf("replace panic %s", err.Error())
 	}

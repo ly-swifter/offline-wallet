@@ -48,62 +48,34 @@ func swap(input []byte, aIdx int, bIdx int, cIdx int, dIdx int) ([]byte, error) 
 // replace the follow originNums in the byte array with the replaceNums given below
 // revere using the contravisal direct
 // you can change those giving numbers as you want
-var originNums = []byte{10}
+var originNums = 119
+var replaceNums = 101
 
-func replace(input []byte, origins []byte) ([]byte, error) {
-	var replaceNumber = 0
-	for i := 1; i < arrayLen; i++ {
-		var isExist = false
-		for j := 0; j < len(input); j++ {
-			if i == int(input[j]) {
-				isExist = true
-				break
-			}
+func replace(input []byte, originNums byte, replaceNums byte) ([]byte, error) {
+	// figure out one number doesn't belongs to the array.
+	var isIn = false  // origin
+	var isOut = false // replace
+	for i := 0; i < len(input); i++ {
+		if input[i] == originNums {
+			isIn = true
 		}
 
-		if !isExist {
-			replaceNumber = i
-			break
+		if input[i] != replaceNums {
+			isOut = true
 		}
 	}
 
-	for i := 0; i < len(origins); i++ {
-		var isIn = false
-		for j := 0; j < len(input); j++ {
-			if origins[i] == input[j] {
-				isIn = true
-				input[i] = byte(replaceNumber)
-			}
-		}
-
-		if isIn {
-			break
-		}
+	if !isIn {
+		return input, nil
 	}
 
-	return input, nil
-}
-
-func reverse(input []byte, origins []byte) ([]byte, error) {
-	var replaceNumber = 0
-	for i := 1; i < arrayLen; i++ {
-		var isExist = false
-		for j := 0; j < len(input); j++ {
-			if i == int(input[j]) {
-				isExist = true
-				break
-			}
-		}
-
-		if !isExist {
-			replaceNumber = i
-			break
-		}
+	if !isOut {
+		return input, nil
 	}
 
 	for i := 0; i < len(input); i++ {
-		if input[i] == byte(replaceNumber) {
-			input[i] = origins[0]
+		if input[i] == originNums {
+			input[i] = replaceNums
 		}
 	}
 
